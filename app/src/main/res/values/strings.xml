@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">SmsServer</string>
+    <string name="server_ip">SERVER IP:</string>
+    <string name="sms_server">SMS Server</string>
+    <string name="start">START</string>
+    <string name="stop">STOP</string>
+    <string name="read">read</string>
+    <string name="USSDclass">USSD</string>
+</resources>
