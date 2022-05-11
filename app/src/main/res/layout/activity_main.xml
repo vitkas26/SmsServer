@@ -8,61 +8,17 @@
     android:background="@android:color/background_light"
     tools:context=".MainActivity">
 
-    <View
-        android:id="@+id/line"
-        android:layout_width="200dp"
-        android:layout_height="2dp"
-        android:layout_marginTop="8dp"
-        android:background="#007AFF"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
-
-    <View
-        android:id="@+id/line2"
-        android:layout_width="200dp"
-        android:layout_height="2dp"
-        android:layout_marginTop="8dp"
-        android:background="#007AFF"
-        android:visibility="invisible"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView9" />
-
-    <DatePicker
-        android:id="@+id/calendar"
-        android:layout_width="346dp"
-        android:layout_height="426dp"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="232dp"
-        android:calendarViewShown="false"
-        android:spinnersShown="true"
-        android:visibility="invisible"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-
-    <ListView
-        android:id="@+id/listView"
-        android:layout_width="375dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/line">
-
-    </ListView>
 
     <EditText
         android:id="@+id/textView3"
         android:layout_width="155dp"
         android:layout_height="40dp"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="30dp"
         android:cursorVisible="false"
         android:focusable="false"
         android:inputType="date"
-        android:text="From:"
+        android:text="11.11.11"
         android:textColor="@android:color/black"
         android:textSize="18sp"
         android:visibility="visible"
@@ -73,12 +29,13 @@
         android:id="@+id/textView5"
         android:layout_width="150dp"
         android:layout_height="40dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="15dp"
         android:cursorVisible="false"
         android:duplicateParentState="true"
         android:focusable="false"
         android:inputType="date"
-        android:text="To"
+        android:text="20.02.20"
         android:textColor="@android:color/black"
         android:textSize="18sp"
         android:visibility="visible"
@@ -89,56 +46,26 @@
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="116dp"
-        android:layout_marginTop="28dp"
+        android:layout_marginTop="16dp"
         android:text="192.168.31.19"
         android:textColor="#333333"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.091"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="MissingConstraints" />
-
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="268dp"
-        android:fontFamily="@font/roboto"
-        android:text="ИСХОДЯЩИЕ"
-        android:textColor="#007AFF"
-        android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.141"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/textView9"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="268dp"
-        android:layout_marginEnd="32dp"
-        android:fontFamily="@font/roboto"
-        android:text="ВХОДЯШИЕ"
-        android:textColor="#007AFF"
-        android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/button"
         android:layout_width="211dp"
         android:layout_height="49dp"
-        android:layout_marginStart="100dp"
         android:layout_marginTop="40dp"
-        android:background="@drawable/button_rounded"
+        android:background="@drawable/button_start"
         android:fontFamily="@font/roboto"
-        android:onClick="end"
-        android:text="СТОП"
-        android:textColor="#D42A2A"
-        android:textSize="20sp"
+        android:text="ЗАПУСТИТЬ"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
@@ -146,11 +73,11 @@
         android:id="@+id/textView6"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="128dp"
         android:layout_marginTop="4dp"
         android:fontFamily="@font/open_sans"
         android:text="Приложение работает"
         android:textColor="#50BF34"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
@@ -158,22 +85,62 @@
         android:id="@+id/textView7"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginStart="34dp"
+        android:layout_marginTop="10dp"
         android:fontFamily="@font/roboto"
         android:text="Начало"
-        app:layout_constraintBottom_toTopOf="@+id/textView3"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button" />
 
     <TextView
         android:id="@+id/textView8"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="78dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="105dp"
         android:fontFamily="@font/roboto"
         android:text="Окончание"
-        app:layout_constraintBottom_toTopOf="@+id/textView5"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button" />
+
+    <FrameLayout
+        android:id="@+id/frameLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/button">
+
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:tabIndicatorColor="#007AFF"
+            app:tabSelectedTextColor="#007AFF"
+            app:tabTextColor="#4DA2FF">
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ИСХОДЯЩИЕ" />
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ВХОДЯЩИЕ" />
+
+        </com.google.android.material.tabs.TabLayout>
+
+        <androidx.viewpager.widget.ViewPager
+            android:id="@+id/viewPager"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:layout_marginBottom="20dp">
+        </androidx.viewpager.widget.ViewPager>
+
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
