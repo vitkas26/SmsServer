@@ -1,10 +1,17 @@
 <resources>
     <string name="app_name">SmsServer</string>
-    <string name="server_ip">SERVER IP:</string>
-    <string name="sms_server">SMS Server</string>
-    <string name="start">START</string>
-    <string name="stop">STOP</string>
-    <string name="read">reinterruptedad</string>
-    <string name="USSDclass">USSD</string>
-
+    <string name="start">Запустить сервер</string>
+    <string name="stop">Остановить сервер</string>
+    <string name="server_running">Сервер работает</string>
+    <string name="server_stopped">Сервер остановлен</string>
+    <string name="server_error">Ошибка запуска: %1$s</string>
+    <string name="server_missing_permissions">Нужны разрешения на чтение и отправку SMS</string>
+    <string name="server_address">Адрес: 127.0.0.1:9900 (только на этом устройстве)</string>
+    <string name="token_hint">Ключ доступа: нажмите, чтобы скопировать</string>
+    <string name="token_copied">Ключ скопирован</string>
+    <string name="inbox">Входящие</string>
+    <string name="sent">Отправленные</string>
+    <string name="from_date">Начальная дата</string>
+    <string name="to_date">Конечная дата</string>
+    <string name="no_messages">Сообщений за выбранные даты нет</string>
 </resources>
