@@ -29,4 +29,29 @@ class GatewayPolicyTest {
         assertFalse(GatewayPolicy.authorized("Bearer test-tokex", token))
         assertFalse(GatewayPolicy.authorized("Bearer test-token-extra", token))
     }
+
+    @Test fun destinationIsRoutedOnlyToItsConfiguredSimSlot() {
+        assertTrue(SimRouting.slotFor("0880173333", "0880173333", "0550890380") == 0)
+        assertTrue(SimRouting.slotFor("0550890380", "0880173333", "0550890380") == 1)
+        assertTrue(SimRouting.slotFor("1234567890", "0880173333", "0550890380") == null)
+    }
+
+    @Test fun operatorPrefixesChooseLongestMatchAndNormalizeInternationalNumbers() {
+        assertTrue(SimRouting.slotFor("+996550123456", "0880173333", "0550890380", listOf("055"), listOf("0550")) == 1)
+        assertTrue(SimRouting.slotFor("996770123456", "0880173333", "0550890380", listOf("0770"), emptyList()) == 0)
+        assertTrue(SimRouting.slotFor("0550890380", "0880173333", "0550890380", listOf("0550"), emptyList()) == 1)
+        assertTrue(SimRouting.slotFor("+996700123456", "0880173333", "0550890380", listOf("0550"), emptyList()) == null)
+    }
+
+    @Test fun operatorPrefixInputRejectsMalformedCodes() {
+        assertTrue(SimRouting.parsePrefixes("0550, 0770\n0880") == listOf("0550", "0770", "0880"))
+        for (bad in listOf("550", "+996550", "0", "0550abc")) {
+            try {
+                SimRouting.parsePrefixes(bad)
+                throw AssertionError("Accepted invalid prefix: $bad")
+            } catch (_: IllegalArgumentException) {
+                // Expected.
+            }
+        }
+    }
 }

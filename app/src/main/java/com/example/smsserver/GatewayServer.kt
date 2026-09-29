@@ -37,6 +37,7 @@ class GatewayServer(
     private val token: String,
     private val placeCall: suspend (String) -> Boolean,
     private val onSent: () -> Unit,
+    private val onUnrouted: (String) -> Unit,
 ) {
     @Volatile private var server: EmbeddedServer<*, *>? = null
 
@@ -96,8 +97,10 @@ class GatewayServer(
                             call.respond(HttpStatusCode.Unauthorized)
                             return@post
                         }
-                        if (ContextCompat.checkSelfPermission(context, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
-                            call.respond(HttpStatusCode.Forbidden, mapOf("error" to "SEND_SMS permission is missing"))
+                        if (listOf(Manifest.permission.SEND_SMS, Manifest.permission.READ_PHONE_STATE).any {
+                                ContextCompat.checkSelfPermission(context, it) != PackageManager.PERMISSION_GRANTED
+                            }) {
+                            call.respond(HttpStatusCode.Forbidden, mapOf("error" to "SMS or phone state permission is missing"))
                             return@post
                         }
                         val request = try { call.receive<SmsRequest>() } catch (_: Exception) {
@@ -112,6 +115,18 @@ class GatewayServer(
                             withContext(Dispatchers.IO) { repository.send(request.phone, request.message) }
                             onSent()
                             call.respond(HttpStatusCode.Accepted, mapOf("status" to "queued"))
+                        } catch (_: DestinationNotConfiguredException) {
+                            onUnrouted(request.phone)
+                            call.respond(
+                                HttpStatusCode.UnprocessableEntity,
+                                mapOf(
+                                    "error" to "OPERATOR_CODE_NOT_CONFIGURED",
+                                    "phone" to request.phone,
+                                    "message" to context.getString(R.string.operator_code_missing, request.phone),
+                                ),
+                            )
+                        } catch (_: SimUnavailableException) {
+                            call.respond(HttpStatusCode.Conflict, mapOf("error" to "Selected SIM is unavailable"))
                         } catch (_: Exception) {
                             call.respond(HttpStatusCode.InternalServerError, mapOf("error" to "SMS could not be queued"))
                         }

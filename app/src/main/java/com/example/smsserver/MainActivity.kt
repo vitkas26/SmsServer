@@ -11,12 +11,15 @@ import android.os.Bundle
 import android.content.pm.PackageManager
 import android.view.View
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.smsserver.databinding.ActivityMainBinding
+import com.example.smsserver.databinding.DialogOperatorCodesBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -33,6 +36,7 @@ import java.util.Date
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var repository: SmsRepository
+    private lateinit var simRouting: SimRouting
     private lateinit var gateway: GatewayServer
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private var running = false
@@ -53,6 +57,12 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         repository = SmsRepository(applicationContext)
+        simRouting = SimRouting(applicationContext)
+        val (sim1Phone, sim2Phone) = simRouting.numbers()
+        binding.sim1Phone.setText(sim1Phone)
+        binding.sim2Phone.setText(sim2Phone)
+        binding.saveRoutes.setOnClickListener { saveRoutes() }
+        binding.operatorCodes.setOnClickListener { showOperatorCodes() }
         gateway = GatewayServer(
             applicationContext,
             repository,
@@ -68,6 +78,11 @@ class MainActivity : AppCompatActivity() {
                 }
             },
             onSent = { runOnUiThread { if (selectedKind == "sent") loadMessages() } },
+            onUnrouted = { phone ->
+                runOnUiThread {
+                    Toast.makeText(this, getString(R.string.operator_code_missing, phone), Toast.LENGTH_LONG).show()
+                }
+            },
         )
         binding.gatewayToken.setText(R.string.token_hint)
         binding.gatewayToken.setOnClickListener {
@@ -78,7 +93,7 @@ class MainActivity : AppCompatActivity() {
         binding.toggleServer.setOnClickListener {
             if (running) stopGateway()
             else permissionLauncher.launch(
-                arrayOf(Manifest.permission.READ_SMS, Manifest.permission.SEND_SMS, Manifest.permission.CALL_PHONE),
+                arrayOf(Manifest.permission.READ_SMS, Manifest.permission.SEND_SMS, Manifest.permission.READ_PHONE_STATE, Manifest.permission.CALL_PHONE),
             )
         }
         binding.inboxButton.setOnClickListener { selectedKind = "inbox"; loadMessages() }
@@ -130,7 +145,60 @@ class MainActivity : AppCompatActivity() {
     private fun hasSmsPermissions(): Boolean = listOf(
         Manifest.permission.READ_SMS,
         Manifest.permission.SEND_SMS,
+        Manifest.permission.READ_PHONE_STATE,
     ).all { ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED }
+
+    private fun saveRoutes() {
+        val sim1Phone = binding.sim1Phone.text.toString().trim()
+        val sim2Phone = binding.sim2Phone.text.toString().trim()
+        if (!GatewayPolicy.validPhone(sim1Phone)) {
+            binding.sim1Phone.error = getString(R.string.invalid_phone)
+            return
+        }
+        if (!GatewayPolicy.validPhone(sim2Phone) || sim1Phone == sim2Phone) {
+            binding.sim2Phone.error = getString(R.string.invalid_or_duplicate_phone)
+            return
+        }
+        simRouting.save(sim1Phone, sim2Phone)
+        binding.routeStatus.setText(R.string.routes_saved)
+    }
+
+    private fun showOperatorCodes() {
+        val fields = DialogOperatorCodesBinding.inflate(layoutInflater)
+        val (sim1Prefixes, sim2Prefixes) = simRouting.prefixes()
+        fields.sim1Codes.setText(sim1Prefixes.joinToString(", "))
+        fields.sim2Codes.setText(sim2Prefixes.joinToString(", "))
+        val dialog = AlertDialog.Builder(this)
+            .setTitle(R.string.operator_codes)
+            .setView(fields.root)
+            .setPositiveButton(R.string.save_routes, null)
+            .setNegativeButton(android.R.string.cancel, null)
+            .create()
+        dialog.setOnShowListener {
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                val first = try {
+                    SimRouting.parsePrefixes(fields.sim1Codes.text.toString())
+                } catch (_: IllegalArgumentException) {
+                    fields.sim1Codes.error = getString(R.string.invalid_operator_codes)
+                    return@setOnClickListener
+                }
+                val second = try {
+                    SimRouting.parsePrefixes(fields.sim2Codes.text.toString())
+                } catch (_: IllegalArgumentException) {
+                    fields.sim2Codes.error = getString(R.string.invalid_operator_codes)
+                    return@setOnClickListener
+                }
+                if (first.intersect(second.toSet()).isNotEmpty()) {
+                    fields.sim2Codes.error = getString(R.string.duplicate_operator_code)
+                    return@setOnClickListener
+                }
+                simRouting.savePrefixes(first, second)
+                binding.routeStatus.setText(R.string.operator_codes_saved)
+                dialog.dismiss()
+            }
+        }
+        dialog.show()
+    }
 
     private fun renderStatus() {
         binding.serverStatus.setText(if (running) R.string.server_running else R.string.server_stopped)

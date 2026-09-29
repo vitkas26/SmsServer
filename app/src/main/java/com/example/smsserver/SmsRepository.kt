@@ -3,7 +3,6 @@ package com.example.smsserver
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
-import android.telephony.SmsManager
 import android.provider.Telephony
 import androidx.core.content.ContextCompat
 import java.util.Date
@@ -11,6 +10,7 @@ import java.util.Date
 data class SmsMessage(val phone: String, val body: String, val timestamp: Long)
 
 class SmsRepository(private val context: Context) {
+    private val simRouting = SimRouting(context)
     private val dao = AppDatabase.getInstance(context).daoData()
 
     fun inbox(start: Date, end: Date): List<SmsMessage> {
@@ -47,7 +47,7 @@ class SmsRepository(private val context: Context) {
         check(ContextCompat.checkSelfPermission(context, Manifest.permission.SEND_SMS) == PackageManager.PERMISSION_GRANTED) {
             "SMS permission is missing"
         }
-        val manager = SmsManager.getDefault()
+        val manager = simRouting.smsManagerFor(phone)
         val parts = manager.divideMessage(message)
         if (parts.size == 1) {
             manager.sendTextMessage(phone, null, message, null, null)

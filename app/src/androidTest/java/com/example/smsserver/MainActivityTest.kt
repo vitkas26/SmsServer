@@ -1,11 +1,13 @@
 package com.example.smsserver
 
+import android.Manifest
 import android.widget.Button
 import android.widget.ListView
 import android.widget.TextView
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
@@ -34,7 +36,7 @@ class MainActivityTest {
 
     @Test fun gatewayRejectsUnauthenticatedSmsAndCanRestart() = runBlocking {
         val context = ApplicationProvider.getApplicationContext<android.content.Context>()
-        val gateway = GatewayServer(context, SmsRepository(context), "test-secret", { false }, {})
+        val gateway = GatewayServer(context, SmsRepository(context), "test-secret", { false }, {}, {})
         try {
             gateway.start()
             assertEquals(200, responseCode("/v1/health"))
@@ -47,7 +49,39 @@ class MainActivityTest {
         }
     }
 
-    private fun responseCode(path: String, body: String? = null): Int {
+    @Test fun gatewayRejectsUnconfiguredNumberWithoutSending() = runBlocking {
+        val context = ApplicationProvider.getApplicationContext<android.content.Context>()
+        InstrumentationRegistry.getInstrumentation().uiAutomation
+            .grantRuntimePermission(context.packageName, Manifest.permission.SEND_SMS)
+        InstrumentationRegistry.getInstrumentation().uiAutomation
+            .grantRuntimePermission(context.packageName, Manifest.permission.READ_PHONE_STATE)
+        var rejectedPhone: String? = null
+        val gateway = GatewayServer(context, SmsRepository(context), "test-secret", { false }, {}, { rejectedPhone = it })
+        try {
+            gateway.start()
+            val response = responseCode(
+                "/v1/sms",
+                """{"phone":"1234567890","message":"test"}""",
+                "test-secret",
+                checkResponse = { body ->
+                    assertTrue(body.contains("OPERATOR_CODE_NOT_CONFIGURED"))
+                    assertTrue(body.contains("1234567890"))
+                    assertTrue(body.contains("message"))
+                },
+            )
+            assertEquals(422, response)
+            assertEquals("1234567890", rejectedPhone)
+        } finally {
+            gateway.stop()
+        }
+    }
+
+    private fun responseCode(
+        path: String,
+        body: String? = null,
+        token: String? = null,
+        checkResponse: ((String) -> Unit)? = null,
+    ): Int {
         Socket().use { socket ->
             socket.connect(InetSocketAddress("127.0.0.1", 9900), 3000)
             socket.soTimeout = 3000
@@ -57,11 +91,14 @@ class MainActivityTest {
                 append("$method $path HTTP/1.1\r\n")
                 append("Host: 127.0.0.1\r\n")
                 append("Connection: close\r\n")
+                if (token != null) append("Authorization: Bearer $token\r\n")
                 if (body != null) append("Content-Type: application/json\r\nContent-Length: ${bytes.size}\r\n")
                 append("\r\n")
             }
             socket.getOutputStream().write(request.toByteArray() + bytes)
-            val statusLine = socket.getInputStream().bufferedReader().readLine()
+            val reader = socket.getInputStream().bufferedReader()
+            val statusLine = reader.readLine()
+            if (checkResponse != null) checkResponse(reader.readText())
             return statusLine.split(' ')[1].toInt()
         }
     }

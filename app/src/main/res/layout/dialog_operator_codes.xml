@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/operator_codes_hint" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:labelFor="@id/sim1Codes"
+        android:text="@string/sim1_codes" />
+
+    <EditText
+        android:id="@+id/sim1Codes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/operator_codes_example"
+        android:inputType="textMultiLine"
+        android:minLines="2" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:labelFor="@id/sim2Codes"
+        android:text="@string/sim2_codes" />
+
+    <EditText
+        android:id="@+id/sim2Codes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/operator_codes_example"
+        android:inputType="textMultiLine"
+        android:minLines="2" />
+</LinearLayout>

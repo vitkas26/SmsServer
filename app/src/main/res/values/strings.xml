@@ -5,7 +5,7 @@
     <string name="server_running">Сервер работает</string>
     <string name="server_stopped">Сервер остановлен</string>
     <string name="server_error">Ошибка запуска: %1$s</string>
-    <string name="server_missing_permissions">Нужны разрешения на чтение и отправку SMS</string>
+    <string name="server_missing_permissions">Нужны разрешения на чтение и отправку SMS и доступ к SIM</string>
     <string name="server_address">Адрес: 127.0.0.1:9900 (только на этом устройстве)</string>
     <string name="token_hint">Ключ доступа: нажмите, чтобы скопировать</string>
     <string name="token_copied">Ключ скопирован</string>
@@ -14,4 +14,21 @@
     <string name="from_date">Начальная дата</string>
     <string name="to_date">Конечная дата</string>
     <string name="no_messages">Сообщений за выбранные даты нет</string>
+    <string name="routes_title">Разрешённые номера получателей</string>
+    <string name="sim1_phone">Номер для SIM 1</string>
+    <string name="sim2_phone">Номер для SIM 2</string>
+    <string name="save_routes">Сохранить номера</string>
+    <string name="routes_hint">SMS отправляются только на эти два номера через указанные SIM.</string>
+    <string name="routes_saved">Номера сохранены.</string>
+    <string name="invalid_phone">Введите номер из 3–15 цифр, можно с + в начале</string>
+    <string name="invalid_or_duplicate_phone">Введите другой корректный номер</string>
+    <string name="operator_codes">Коды операторов</string>
+    <string name="operator_codes_hint">Укажите префиксы номеров через запятую или пробел. Например: 0550, 0770. Полный номер из основного экрана имеет приоритет.</string>
+    <string name="sim1_codes">Префиксы для SIM 1</string>
+    <string name="sim2_codes">Префиксы для SIM 2</string>
+    <string name="operator_codes_example">Например: 0550, 0770</string>
+    <string name="invalid_operator_codes">Префикс: 0 и ещё 2–5 цифр</string>
+    <string name="duplicate_operator_code">Один префикс нельзя назначить обеим SIM</string>
+    <string name="operator_codes_saved">Коды операторов сохранены.</string>
+    <string name="operator_code_missing">Номер %1$s: код оператора не добавлен</string>
 </resources>
